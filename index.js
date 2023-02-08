@@ -17,6 +17,7 @@ async function run() {
     const productsCollection = db.collection("products");
     const blogsCollection = db.collection("blogs");
     const usersCollection = db.collection("users");
+    const cuponCollection = db.collection("cupons");
     // post product
     app.post("/addproduct", async (req, res) => {
       const data = req.body;
@@ -56,6 +57,35 @@ async function run() {
         res.send({ message: "Already have an account" });
       }
       const result = await usersCollection.insertOne(data);
+      res.send(result);
+    });
+
+    // post Cupon
+
+    app.post("/cupon", async (req, res) => {
+      const cupon = req?.body;
+      const result = await cuponCollection.insertOne(cupon);
+
+      res.send(result);
+    });
+
+    // get Cupon
+    app.get("/cupon", async (req, res) => {
+      const cursor = await cuponCollection.find({});
+      const result = await cursor.toArray();
+     res.send({result,status: 200})
+    });
+    // delete Cupon
+    app.delete("/cupon", async (req, res) => {
+      const result = await cuponCollection.delete({});
+      res.send(result);
+    });
+
+    // update Cupon
+    app.put("/cupon", async (req, res) => {
+      const result = await cuponCollection.updateOne({
+        set: { code: cupon.code },
+      });
       res.send(result);
     });
   } finally {

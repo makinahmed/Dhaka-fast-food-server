@@ -7,6 +7,7 @@ require("dotenv").config();
 app.use(cors());
 app.use(bodyParser.json());
 const PORT = process.env.PORT || process.env.port_name;
+// const stripe = require("stripe")(`${process.env.STRIPE_KEY}`);99*
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.m8c0v.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -18,6 +19,7 @@ async function run() {
     const blogsCollection = db.collection("blogs");
     const usersCollection = db.collection("users");
     const cuponCollection = db.collection("cupons");
+    const soldCollection = db.collection("soldproducts");
     // post product
     app.post("/addproduct", async (req, res) => {
       const data = req.body;
@@ -60,6 +62,27 @@ async function run() {
       res.send(result);
     });
 
+    // sold product
+
+    app.post("/sold", async (req, res) => {
+      const product = req?.body;
+      console.log(product);
+
+      const result = await soldCollection.insertOne(product);
+
+      res.send(result);
+    });
+    // get Cupon
+    app.get("/checkcupon", async (req, res) => {
+      const cupon = req.body.data;
+      console.log(cupon);
+      // const cursor = await cuponCollection.findOne({ cupon });
+      // if (cursor.cupon.toLowerCase() !== cupon.toLowerCase()) {
+      //   res.send({ message: false });
+      // }
+      // res.send({ message: true });
+    });
+
     // post Cupon
 
     app.post("/cupon", async (req, res) => {
@@ -69,25 +92,30 @@ async function run() {
       res.send(result);
     });
 
-    // get Cupon
-    app.get("/cupon", async (req, res) => {
-      const cursor = await cuponCollection.find({});
-      const result = await cursor.toArray();
-     res.send({result,status: 200})
-    });
-    // delete Cupon
-    app.delete("/cupon", async (req, res) => {
-      const result = await cuponCollection.delete({});
-      res.send(result);
-    });
+    // stripe integration
 
-    // update Cupon
-    app.put("/cupon", async (req, res) => {
-      const result = await cuponCollection.updateOne({
-        set: { code: cupon.code },
-      });
-      res.send(result);
-    });
+    // app.post("/create-payment-intent", async (req, res) => {
+    //   // sold product total amount
+
+    //   const amount = body.data;
+
+     
+
+    //   const { items } = req.body;
+    //   const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: calculateOrderAmount(items),
+    //     currency: "usd",
+    //     amount: amount,
+    //     payment_method_types: ["card"],
+    //     automatic_payment_methods: {
+    //       enabled: true,
+    //     },
+    //   });
+
+    //   res.send({
+    //     clientSecret: paymentIntent.client_secret,
+    //   });
+    // });
   } finally {
     // await client.close();
   }

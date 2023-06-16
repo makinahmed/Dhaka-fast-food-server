@@ -6,7 +6,8 @@ const app = express();
 require("dotenv").config();
 app.use(cors());
 app.use(bodyParser.json());
-const PORT = process.env.PORT || process.env.port_name;
+// const PORT = process.env.PORT || process.env.port_name;
+const PORT = 8000;
 // const stripe = require("stripe")(`${process.env.STRIPE_KEY}`);99*
 
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.m8c0v.mongodb.net/?retryWrites=true&w=majority`;
@@ -32,7 +33,6 @@ async function run() {
     app.get("/products", async (req, res) => {
       const cursor = await productsCollection.find({});
       const data = await cursor.toArray();
-
       res.send(data);
     });
 
@@ -67,11 +67,27 @@ async function run() {
     app.post("/sold", async (req, res) => {
       const product = req?.body;
       console.log(product);
-
       const result = await soldCollection.insertOne(product);
-
       res.send(result);
     });
+
+    // get sold product
+
+    app.get("/sold", async (req, res) => {
+      const crusor = await soldCollection.find({});
+      const result = await crusor.toArray();
+      res.send(result);
+    });
+
+    // get single sold product
+
+    app.get(`/sold/:email`, async (req, res) => {
+      const email = req.params.email
+      const crusor = await soldCollection.find({ email });
+      const result = await crusor.toArray();
+      res.send(result);
+    });
+
     // get Cupon
     app.get("/checkcupon", async (req, res) => {
       const cupon = req.body.data;
@@ -98,8 +114,6 @@ async function run() {
     //   // sold product total amount
 
     //   const amount = body.data;
-
-     
 
     //   const { items } = req.body;
     //   const paymentIntent = await stripe.paymentIntents.create({

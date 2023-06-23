@@ -82,10 +82,26 @@ async function run() {
     // get single sold product
 
     app.get(`/sold/:email`, async (req, res) => {
-      const email = req.params.email
+      const email = req.params.email;
       const crusor = await soldCollection.find({ email });
       const result = await crusor.toArray();
       res.send(result);
+    });
+
+    // update sold product
+
+    app.put("/sold", async (req, res) => {
+      const data = req.body;
+      const email = req.body.email;
+       const updateDoc = {
+         $set: {
+           status: data.status,
+         },
+       };
+       const result = await soldCollection.updateOne({ email }, updateDoc);
+
+      res.send(result)
+
     });
 
     // get Cupon
@@ -99,14 +115,6 @@ async function run() {
       // res.send({ message: true });
     });
 
-    // post Cupon
-
-    app.post("/cupon", async (req, res) => {
-      const cupon = req?.body;
-      const result = await cuponCollection.insertOne(cupon);
-
-      res.send(result);
-    });
 
     // stripe integration
 
